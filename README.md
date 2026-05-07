@@ -2,7 +2,9 @@
 
 Module 6 Week A lab for AI.SPIRE Applied AI & ML Systems.
 
-Build and compare Named Entity Recognition (NER) pipelines using spaCy and Hugging Face on climate-related text data.
+In this lab, I built a complete Named Entity Recognition (NER) pipeline using both spaCy and Hugging Face, then compared their outputs and evaluated performance against a gold standard dataset.
+
+---
 
 ## Setup
 
@@ -12,30 +14,120 @@ pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
 
-The Hugging Face NER pipeline runs on PyTorch; we install the CPU wheel explicitly so the download stays small. `requirements.txt` intentionally omits `torch`. The spaCy model download is ~12 MB. The first run of the HF NER model will download ~250 MB of model weights — this is a one-time download.
+- Hugging Face models run on PyTorch (CPU version to keep size small)
+- spaCy model is lightweight (~12MB)
+- First run will download the HF model (~250MB) — one-time only
 
-## Tasks
+---
 
-Complete the seven functions in `ner_pipeline.py`:
-1. `load_data(filepath)` — Load the climate articles dataset
-2. `explore_data(df)` — Return a summary dict (shape, language/category counts, text length stats)
-3. `preprocess_text(text, nlp)` — NFC-normalize and return lowercased lemmas using the injected spaCy pipeline
-4. `extract_spacy_entities(df, nlp)` — Extract entities using spaCy NER
-5. `extract_hf_entities(df, ner_pipeline)` — Extract entities using Hugging Face NER (merge `##` subwords and strip `B-`/`I-` IOB prefix)
-6. `compare_ner_outputs(spacy_df, hf_df)` — Entity counts per system plus `both`/`spacy_only`/`hf_only` overlap sets
-7. `evaluate_ner(predicted_df, gold_df)` — Compute entity-level precision, recall, F1
+## What I Built
 
-## Submission
+The pipeline includes:
 
-1. Create a branch: `lab-6a-ner-pipeline`
-2. Complete `ner_pipeline.py`
-3. Open a PR to `main`
-4. Paste your PR URL into TalentLMS → Module 6 Week A → Lab 6A
+- Data loading and exploration  
+- Text preprocessing (normalization + lemmatization)  
+- Named Entity extraction using two different systems  
+- Output comparison between models  
+- Evaluation using precision, recall, and F1  
+
+---
+
+## Tasks Implemented
+
+1. **load_data(filepath)**  
+   Load the climate dataset into a DataFrame.
+
+2. **explore_data(df)**  
+   Generate a summary including:
+   - dataset shape  
+   - language distribution  
+   - category distribution  
+   - text length statistics  
+
+3. **preprocess_text(text, nlp)**  
+   - Apply Unicode normalization (NFC)  
+   - Remove punctuation and spaces  
+   - Convert to lowercase lemmas  
+
+4. **extract_spacy_entities(df, nlp)**  
+   - Filter English texts  
+   - Extract entities using spaCy  
+   - Return structured DataFrame  
+
+5. **extract_hf_entities(df, ner_pipeline)**  
+   - Use Hugging Face NER pipeline  
+   - Merge subword tokens (`##`)  
+   - Clean labels (remove `B-` / `I-`)  
+
+6. **compare_ner_outputs(spacy_df, hf_df)**  
+   - Count entities per system  
+   - Compute overlap:
+     - both  
+     - spaCy-only  
+     - HF-only  
+
+7. **evaluate_ner(predicted_df, gold_df)**  
+   - Compute:
+     - Precision  
+     - Recall  
+     - F1 score  
+   - Exact match based on:
+     `(text_id, entity_text, entity_label)`
+
+---
+
+## Results Summary
+
+- spaCy detected more entities overall and achieved higher recall  
+- Hugging Face detected fewer entities and had lower recall  
+- Both systems showed very low precision, meaning many predictions were incorrect  
+
+### Key Insight
+
+- spaCy is better at coverage (recall) but introduces noise  
+- Hugging Face struggles more, likely due to tokenization (WordPiece splitting)  
+- Small gold dataset (~10 texts) makes evaluation unstable  
+
+---
+
+## Example Output
+
+```
+spaCy entities: 1202
+HF entities: 1125
+
+Both: 230
+spaCy-only: 958
+HF-only: 826
+
+spaCy F1 ≈ 0.07
+HF F1 ≈ 0.01
+```
+
+---
+
+## Submission Steps
+
+```bash
+git checkout -b lab-6a-ner-pipeline
+git add .
+git commit -m "Complete NER pipeline lab"
+git push --set-upstream origin lab-6a-ner-pipeline
+```
+
+Then open a Pull Request to `main` and submit the link on TalentLMS.
+
+---
+
+## Notes
+
+- Results are not expected to be high due to:
+  - small gold dataset  
+  - strict matching conditions  
+- Focus is on correct pipeline implementation and analysis
 
 ---
 
 ## License
 
 This repository is provided for educational use only. See [LICENSE](LICENSE) for terms.
-
-You may clone and modify this repository for personal learning and practice, and reference code you wrote here in your professional portfolio. Redistribution outside this course is not permitted.
